@@ -1,8 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.db import models
 
+
 class CustomUserManager(BaseUserManager):
-    def create_user(self, gmail, phone_number, first_name, last_name, password=None):
+    def create_user(self, gmail, phone_number, first_name, last_name):
         if not gmail:
             raise ValueError("The Gmail field is required")
         user = self.model(
@@ -28,6 +29,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     gmail = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, unique=True)
@@ -47,3 +49,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.gmail
+
+    def __int__(self):
+        self.fields['password1'].required = False
+        self.fields['password2'].required = False
+
+    def change_password(self, new_password):
+        return True
