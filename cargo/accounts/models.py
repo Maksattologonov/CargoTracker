@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.db import models
 
+from accounts.utils import generate_next_auth_key
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, gmail, phone_number, first_name, last_name):
@@ -33,6 +35,10 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     gmail = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, unique=True)
+    telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
+    auth_key = models.CharField(max_length=5, unique=True, db_index=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     is_active = models.BooleanField(default=True)
@@ -56,3 +62,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def change_password(self, new_password):
         return True
+
+    class Meta:
+        ordering = ['auth_key']
+
+    def save(self, *args, **kwargs):
+        if not self.auth_key:
+            self.auth_key = generate_next_auth_key()
+        super().save(*args, **kwargs)

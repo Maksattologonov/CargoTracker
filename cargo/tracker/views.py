@@ -12,9 +12,14 @@ def track(request):
             if form.is_valid():
                 ship = Ship24Service()
                 parsed_data = ship.request(form.cleaned_data.get('track_code'))
-                return render(request, "tracker/tracking_data.html", {"trackings": parsed_data})
+                print(parsed_data)
+                return render(request, "templates/tracker/tracking_data.html", {"trackings": parsed_data})
         else:
             form = CargoForm()
-        return render(request, 'tracker/tracker.html', {'form': form})
+            return render(request, 'templates/tracker/tracker.html', {'form': form})
     except Exception as e:
-        return render(request, 'tracker/error.html')
+        return render(request, 'templates/tracker/error.html', {'error': str(e)})
+
+
+def home(request):
+    return render(request, 'main.html')

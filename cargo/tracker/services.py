@@ -1,8 +1,9 @@
 import json
+import requests
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-import requests
+from deep_translator import GoogleTranslator
 
 
 class Ship24Service:
@@ -13,9 +14,10 @@ class Ship24Service:
 
     def request(self, track_code):
         response = requests.post(url=self.url,
-                                 data=json.dumps({"trackingNumber": f'{track_code}'}),
+                                 data=json.dumps({"trackingNumber": f'{track_code}', "lang": "ru"}),
                                  headers={'Content-Type': 'application/json',
-                                          'Authorization': f'Bearer {self.token}'})
+                                          'Authorization': f'Bearer {self.token}'},
+                                 verify=False)
         self.data = response.json()
 
         if "errors" in self.data and self.data["errors"]:
@@ -33,7 +35,7 @@ class Ship24Service:
             last_event = max(tracking.get("events", []), key=lambda e: e.get("datetime", ""), default={})
             last_status = last_event.get("status")
             last_datetime = last_event.get("datetime")
-            last_location = last_event.get("location")
+            last_location = last_event.get("location", "")
 
             self.results.update({
                 "trackingNumber": tracking_number,
@@ -45,4 +47,5 @@ class Ship24Service:
                     "location": last_location
                 }
             })
+            print(self.results)
         return self.results

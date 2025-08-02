@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'accounts',
-    'tracker'
+    'tracker',
+    'django_telegram_login'
 ]
 
 MIDDLEWARE = [
@@ -55,10 +56,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'cargo.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR, 'templates'],
+        'DIRS': [BASE_DIR, 'cargo/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,4 +132,8 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 BASE_URL_SHIP24 = 'https://api.ship24.com/public/v1/trackers/track'
-BASE_SHIP24_TOKEN = 'apik_clFqOiHGPpKMiitQ3i1t7OTM1tKxRv'
+BASE_SHIP24_TOKEN = 'apik_wTmqXDk6WxpY8fJUgptgB4hqFxo2dE'
+
+TELEGRAM_BOT_NAME = 'ExpressZakazbot'
+TELEGRAM_BOT_TOKEN = '8253286981:AAFmi8mGOlnOYPCDowx4DNHXKmJCWqVb0W0'
+TELEGRAM_LOGIN_REDIRECT_URL = 'https://kqmxkdqitb.localtunnel.me/'
