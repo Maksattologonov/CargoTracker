@@ -1,12 +1,19 @@
 # auth_key_generator.py
+from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import CustomUser
 
 
 def generate_next_auth_key():
+    """Return the next unique auth key.
+
+    Using ``get_user_model`` avoids a direct import of ``CustomUser`` which
+    would otherwise create a circular import between the model and this
+    utility module.
+    """
+    user_model = get_user_model()
     with transaction.atomic():
         # Блокируем таблицу для предотвращения race condition
-        last_user = CustomUser.objects.select_for_update().order_by('-auth_key').first()
+        last_user = user_model.objects.select_for_update().order_by('-auth_key').first()
 
         if not last_user:
             return 'C0001'

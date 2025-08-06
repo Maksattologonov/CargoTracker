@@ -5,15 +5,18 @@ from accounts.utils import generate_next_auth_key
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, gmail, phone_number, first_name, last_name):
+    def create_user(self, gmail, phone_number, first_name, last_name, password=None):
+        """Create and return a user with the given credentials."""
         if not gmail:
             raise ValueError("The Gmail field is required")
         user = self.model(
             gmail=self.normalize_email(gmail),
             phone_number=phone_number,
             first_name=first_name,
-            last_name=last_name
+            last_name=last_name,
         )
+        # ``set_password`` correctly handles ``None`` by setting an unusable
+        # password, so we can pass it through directly.
         user.set_password(password)
         user.save(using=self._db)
         return user
