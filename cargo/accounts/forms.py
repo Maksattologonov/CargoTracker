@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser
+from .utils import generate_next_auth_key
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 
@@ -40,6 +41,14 @@ class UserRegisterForm(forms.ModelForm):
         self.fields['phone_number'].widget.attrs['class'] = 'form-control form-control-lg'
         self.fields['first_name'].widget.attrs['class'] = 'form-control form-control-lg'
         self.fields['last_name'].widget.attrs['class'] = 'form-control form-control-lg'
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if not user.auth_key:
+            user.auth_key = generate_next_auth_key()
+        if commit:
+            user.save()
+        return user
 
     labels = {
         'name': _('form-control form-control-lg'),
