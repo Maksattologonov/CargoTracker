@@ -1,6 +1,6 @@
 # auth_key_generator.py
 from django.db import transaction
-from models import CustomUser
+from .models import CustomUser
 
 
 def generate_next_auth_key():

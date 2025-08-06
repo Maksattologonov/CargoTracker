@@ -1,7 +1,9 @@
 # authentication.py
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-from models import CustomUser
+
+from .models import CustomUser
+
 
 class TelegramAuthKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):

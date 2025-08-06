@@ -1,5 +1,6 @@
 # telegram_auth.py
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -7,28 +8,29 @@ User = get_user_model()
 
 
 def handle_telegram_login(update: Update, context: CallbackContext):
+    """Link a Telegram user to a site account using an auth key.
+
+    The user should send their unique ``auth_key`` to the bot. If a matching
+    account is found, the Telegram ``id`` is stored on the user model and the
+    bot confirms the successful authentication. Otherwise an error message is
+    sent.
+    """
     telegram_user = update.effective_user
+    auth_key = (update.message.text or '').strip()
 
     with transaction.atomic():
-        user, created = User.objects.get_or_create(
-            telegram_id=telegram_user.id,
-            defaults={
-                'username': f"tg_{telegram_user.id}",
-                'first_name': telegram_user.first_name,
-                'last_name': telegram_user.last_name,
-            }
-        )
-
-        if created:
+        try:
+            user = User.objects.select_for_update().get(auth_key=auth_key)
+            user.telegram_id = telegram_user.id
+            user.save(update_fields=["telegram_id"])
             context.bot.send_message(
                 chat_id=telegram_user.id,
-                text=f"Ваш ключ доступа: {user.auth_key}\n"
-                     f"Используйте его для входа в систему."
+                text="Вы успешно авторизовались."
             )
-        else:
+            return user
+        except User.DoesNotExist:
             context.bot.send_message(
                 chat_id=telegram_user.id,
-                text=f"Добро пожаловать назад! Ваш ключ: {user.auth_key}"
+                text="Неверный код авторизации."
             )
-
-    return user
+            return None
