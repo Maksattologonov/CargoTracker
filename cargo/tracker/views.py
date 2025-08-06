@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from tracker.forms import CargoForm
+from tracker.forms import CargoForm, CalculatorForm
 from tracker.services import Ship24Service
 
 
@@ -23,3 +23,20 @@ def track(request):
 
 def home(request):
     return render(request, 'main.html')
+
+
+def calculator(request):
+    """Calculate shipment cost based on weight."""
+    price = None
+    if request.method == 'POST':
+        form = CalculatorForm(request.POST)
+        if form.is_valid():
+            weight = form.cleaned_data['weight']
+            price = weight * 3.2
+    else:
+        form = CalculatorForm()
+    return render(
+        request,
+        'templates/tracker/calculator.html',
+        {'form': form, 'price': price},
+    )
