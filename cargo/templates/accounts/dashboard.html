@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Добро пожаловать!</h1>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                Выйти
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="user-info">
+            <div class="text-center">
+                {% if telegram_data.photo_url %}
+                    <img src="{{ telegram_data.photo_url }}" 
+                         alt="Avatar" 
+                         class="telegram-avatar">
+                {% else %}
+                    <div class="telegram-avatar bg-secondary d-flex align-items-center justify-content-center text-white">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                {% endif %}
+                
+                <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                
+                {% if telegram_data.username %}
+                    <p class="text-muted">@{{ telegram_data.username }}</p>
+                {% endif %}
+                
+                <p class="small text-muted">
+                    Пользователь: {{ user.username }}<br>
+                    ID: {{ user.id }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Информация о сессии</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <strong>Дата регистрации:</strong><br>
+                        {{ user.date_joined|date:"d.m.Y H:i" }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Последний вход:</strong><br>
+                        {{ user.last_login|date:"d.m.Y H:i"|default:"Никогда" }}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-sm-6">
+                        <strong>Статус:</strong><br>
+                        <span class="badge bg-success">Активен</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Тип авторизации:</strong><br>
+                        <span class="badge bg-info">Telegram</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Дополнительный контент -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="d-grid">
+                            <button class="btn btn-primary" onclick="showProfile()">
+                                Редактировать профиль
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-grid">
+                            <button class="btn btn-secondary" onclick="showSettings()">
+                                Настройки
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showProfile() {
+    alert('Функция редактирования профиля');
+}
+
+function showSettings() {
+    alert('Функция настроек');
+}
+
+// Проверка статуса авторизации
+function checkAuthStatus() {
+    fetch('/api/auth-status/')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.is_authenticated) {
+                window.location.href = '/telegram-login/';
+            }
+        });
+}
+
+// Проверяем каждые 5 минут
+setInterval(checkAuthStatus, 300000);
+</script>
+{% endblock %}

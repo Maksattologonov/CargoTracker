@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Обработка авторизации{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+                <h5>Обрабатываем авторизацию...</h5>
+                <p class="text-muted">Пожалуйста, подождите</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Автоматическая отправка данных если они есть в URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('hash')) {
+        // Данные от Telegram есть в URL, форма уже обрабатывается на сервере
+        setTimeout(function() {
+            // Если через 5 секунд не произошел редирект, показываем ошибку
+            const card = document.querySelector('.card-body');
+            card.innerHTML = `
+                <div class="alert alert-warning">
+                    <h5>Что-то пошло не так</h5>
+                    <p>Попробуйте войти снова</p>
+                    <a href="/telegram-login/" class="btn btn-primary">
+                        Повторить вход
+                    </a>
+                </div>
+            `;
+        }, 5000);
+    } else {
+        // Нет данных от Telegram, редирект на страницу входа
+        window.location.href = '/telegram-login/';
+    }
+});
+</script>
+{% endblock %}
