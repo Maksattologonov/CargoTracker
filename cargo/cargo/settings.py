@@ -60,7 +60,7 @@ ROOT_URLCONF = 'cargo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR, 'cargo/templates'],
+        'DIRS': [r'C:\Users\MTologonov\PycharmProjects\CargoTracker\cargo\templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
